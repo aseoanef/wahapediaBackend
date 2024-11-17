@@ -19,5 +19,15 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path('operative/', admin.site.urls),
+    path('uniqueaction/', admin.site.urls),
+    path('gun/', admin.site.urls),
+    path('attack/<int:gunId>/', admin.site.urls),
+    path('specialrule/', admin.site.urls),
+    path('army/', admin.site.urls),
+    path('ability/', admin.site.urls),
+    path('customarmy/', admin.site.urls),
+    path('customarmy/<int:customarmyId>/', admin.site.urls),
+    path('operativegun/', admin.site.urls),
+    path('operativegun/<int:operativegunId>/', admin.site.urls),
 ]
