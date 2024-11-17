@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from warhammer import endpoints
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('operative/', admin.site.urls),
+    path('operative/', endpoints.operative),
     path('uniqueaction/', admin.site.urls),
     path('gun/', admin.site.urls),
     path('attack/<int:gunId>/', admin.site.urls),

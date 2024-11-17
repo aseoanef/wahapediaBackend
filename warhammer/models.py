@@ -1,7 +1,4 @@
-from tkinter.constants import CASCADE
-
 from django.db import models
-from django.db.models import DO_NOTHING
 
 
 # Create your models here.
@@ -15,8 +12,23 @@ class Operative(models.Model):
     sv = models.IntegerField() #save throw
     w = models.IntegerField() #wounds
     base= models.IntegerField() #base diametro
-    unique_action = models.ForeignKey('UniqueAction',blank=True,null=True,on_delete=models.DO_NOTHING)
-    gun = models.ForeignKey('Gun',blank=True,on_delete=models.DO_NOTHING)
+    unique_action = models.ManyToManyField('UniqueAction',blank=True,null=True)
+    gun = models.ManyToManyField('Gun',blank=True)
+    def to_json(self):
+        return {
+            "id": self.pk,
+            "name": self.name,
+            "stats":{
+                "movement": self.movement,
+                "dash": self.dash,
+                "apl": self.apl,
+                "ga": self.ga,
+                "df": self.df,
+                "sv": self.sv,
+                "w": self.w,
+                "base": self.base,
+            },
+        }
 
 class UniqueAction(models.Model):
     name = models.CharField(max_length=240,)
@@ -29,7 +41,7 @@ class Gun(models.Model):
     ws = models.IntegerField() #wounds save
     dmg = models.IntegerField() #damage standard
     critical_dmg = models.IntegerField() #critical damage
-    special_rule = models.ForeignKey('SpecialRule',blank=True,null=True,on_delete=DO_NOTHING)
+    special_rule = models.ForeignKey('SpecialRule',blank=True,null=True,on_delete=models.DO_NOTHING)
 
 class SpecialRule(models.Model):
     name = models.CharField(max_length=240)
@@ -38,18 +50,18 @@ class SpecialRule(models.Model):
 
 class Army(models.Model):
     name = models.CharField(max_length=240,null=False,)
-    operatives = models.ForeignKey('Operative',blank=True,null=True,on_delete=DO_NOTHING)
+    operatives = models.ForeignKey('Operative',blank=True,null=True,on_delete=models.DO_NOTHING)
     ability = models.ForeignKey('Ability', blank=True, on_delete=models.DO_NOTHING)
     faction = models.CharField(max_length=240,)
 
 class CustomArmy(models.Model):
     name = models.CharField(max_length=240,null=False)
-    army = models.ForeignKey('Army',on_delete=CASCADE)
-    operative = models.ForeignKey('Operative',on_delete=CASCADE)
+    army = models.ForeignKey('Army',on_delete=models.CASCADE)
+    operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
 
 class OperativeGun(models.Model):
-    operative = models.ForeignKey('Operative',on_delete=CASCADE)
-    gun = models.ForeignKey('Gun',on_delete=CASCADE)
+    operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
+    gun = models.ForeignKey('Gun',on_delete=models.CASCADE)
 
 class Ability(models.Model):
     name = models.CharField(max_length=240,)
