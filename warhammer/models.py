@@ -11,8 +11,8 @@ class Operative(models.Model):
     sv = models.IntegerField() #save throw
     w = models.IntegerField() #wounds
     base= models.IntegerField() #base diametro
-    unique_action = models.ManyToManyField('UniqueAction',blank=True,null=True)
-    #gun = models.ManyToManyField('Gun',blank=True)
+    unique_action = models.ManyToManyField('UniqueAction')
+    gun = models.ManyToManyField('Gun')
     def to_json(self):
         return {
             "id": self.pk,
@@ -29,10 +29,12 @@ class Operative(models.Model):
             },
         }
 
+
 class UniqueAction(models.Model):
     name = models.CharField(max_length=240,)
     cost = models.IntegerField(default=1,)
     description = models.CharField(max_length=1000,)
+
 
 class Gun(models.Model):
     name = models.CharField(max_length=240,)
@@ -54,8 +56,6 @@ class Gun(models.Model):
         }
 
 
-
-
 class SpecialRule(models.Model):
     name = models.CharField(max_length=240)
     description = models.CharField(max_length=1000)
@@ -71,22 +71,23 @@ class SpecialRule(models.Model):
 
 class Army(models.Model):
     name = models.CharField(max_length=240,null=False,)
-    operatives = models.ForeignKey('Operative',blank=True,null=True,on_delete=models.DO_NOTHING)
+    operatives = models.ManyToManyField('Operative')
     ability = models.ForeignKey('Ability', blank=True, on_delete=models.DO_NOTHING)
     faction = models.CharField(max_length=240,)
+
 
 class CustomArmy(models.Model):
     name = models.CharField(max_length=240,null=False)
     army = models.ForeignKey('Army',on_delete=models.CASCADE)
     operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
 
+
 class OperativeGun(models.Model):
     operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
-    #gun = models.ForeignKey('Gun',on_delete=models.CASCADE)
+    gun = models.ForeignKey('Gun',on_delete=models.CASCADE)
+
 
 class Ability(models.Model):
     name = models.CharField(max_length=240,)
     description = models.CharField(max_length=1000)
     cost = models.IntegerField()
-
-
