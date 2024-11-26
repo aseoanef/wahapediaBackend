@@ -1,5 +1,5 @@
 import json
-
+import random
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
 from django.views.decorators.csrf import csrf_exempt
@@ -249,6 +249,43 @@ def gunbyId(request,gunId):
                 'ws': gun.ws,
                 'dmg': gun.dmg,
                 'critical_dmg': gun.dmg,
+            },
+            'rules': ruleses,
+        }
+        return JsonResponse(json_response, safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+def attack(request,gunId):#metodo para simular un ataque de un arma por id
+    if request.method == "GET":
+        try:
+            gun = Gun.objects.get(id=gunId)
+        except gun.DoesNotExist:
+            return JsonResponse({"error": "Gun was not found"}, status=404)
+        rules = gun.special_rule.all()
+        ruleses = []
+        dices=[]
+        potentialdmg=0
+        for x in range(gun.attacks):
+            roll=random.randint(1,6)
+            if roll >= gun.ws:
+                if roll == 6:
+                    potentialdmg+=gun.critical_dmg
+                potentialdmg+=gun.dmg
+            dices.append(roll)
+        for rule in rules:
+            ruleses.append(rule.name)
+        json_response = {
+            'name': gun.name,
+            'result': {
+                'attacks': dices,
+                'max_dmg':potentialdmg,
+            },
+            'stats':{
+                'ws/bs':gun.ws,
+                'dmg': gun.dmg,
+                'critical_dmg': gun.critical_dmg,
             },
             'rules': ruleses,
         }
