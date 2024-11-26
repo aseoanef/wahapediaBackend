@@ -267,16 +267,16 @@ def attack(request,gunId):#metodo para simular un ataque de un arma por id
         ruleses = []
         dices=[]
         potentialdmg=0
-        for x in range(gun.attacks):
-            roll=random.randint(1,6)
-            if roll >= gun.ws:
-                if roll == 6:
-                    potentialdmg+=gun.critical_dmg
-                potentialdmg+=gun.dmg
-            dices.append(roll)
+        for x in range(gun.attacks):#hacemos un loop para  titar los dados por cada ataque
+            roll=random.randint(1,6)#simulamos la tirada de 1d6 (un dado de 6 caras)
+            if roll >= gun.ws: #comprobamos si da el ataque
+                if roll == 6: #si es crítico
+                    potentialdmg+=gun.critical_dmg #sumamos el daño de critico
+                potentialdmg+=gun.dmg #sumamos el daño de critico
+            dices.append(roll) #guardamos todos los dados por si alguna habilidad se activa aunque falle el ataque
         for rule in rules:
-            ruleses.append(rule.name)
-        json_response = {
+            ruleses.append(rule.name) #añadimos todas las reglas que competen para facil acceso
+        json_response = { #fabricamos la respuesta
             'name': gun.name,
             'result': {
                 'attacks': dices,
@@ -394,4 +394,3 @@ def abilitybyId(request,abilityId):
         JsonResponse(json_response,safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
-
