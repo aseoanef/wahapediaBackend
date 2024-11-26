@@ -20,6 +20,8 @@ from warhammer import endpoints
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('army/',endpoints.army),
+    path('army/<int:armyId>',endpoints.armybyId),
     path('operative/', endpoints.operative),
     path('operative/<int:operativeId>', endpoints.operativebyId),
     path('gun/', endpoints.gun),

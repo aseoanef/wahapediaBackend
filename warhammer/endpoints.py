@@ -1,11 +1,91 @@
 import json
 
 from django.http import JsonResponse
-from .models import Operative, Gun, SpecialRule, UniqueAction, Ability
+from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
 from django.views.decorators.csrf import csrf_exempt
 
 
-@csrf_exempt
+def army(request):
+    # Manejar la solicitud GET
+    if request.method == 'GET':
+        # checkea si tiene nombre en el header y filtrar en caso positivo
+        if request.headers.get("armyName") != None:
+            armyName = request.headers.get("armyName")
+            try:
+                all_rows = Army.objects.filter(name=armyName)
+            except all_rows.DoesNotExist:
+                return JsonResponse({"error": "Army was not found"}, status=404)
+            json_response = []
+            for row in all_rows:
+                operatives = row.operatives.all()
+                operativeses = []
+                abilitys = row.ability.all()
+                abilityses = []
+                for operative in operatives:
+                    operativeses.append(operative.name)
+                for ability in abilitys:
+                    abilityses.append(ability.name)
+                json_response.append({
+                    'id': row.pk,
+                    'name': row.name,
+                    'faction': row.faction,
+                    'operatives': operativeses,
+                    'abilities': abilityses,
+                })
+        # si no tiene nombre en el header devuelve todos
+        else:
+            all_rows = Army.objects.all()
+            json_response = []
+            for row in all_rows:
+                operatives = row.operatives.all()
+                operativeses = []
+                abilitys = row.ability.all()
+                abilityses = []
+                for operative in operatives:
+                    operativeses.append(operative.name)
+                for ability in abilitys:
+                    abilityses.append(ability.name)
+                json_response.append({
+                    'id': row.pk,
+                    'name': row.name,
+                    'faction': row.faction,
+                    'operatives': operativeses,
+                    'abilities': abilityses,
+                })
+        return JsonResponse(json_response, safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+def armybyId(request,armyId):
+    # Manejar la solicitud GET
+    if request.method == 'GET':
+        try:
+            all_rows = Army.objects.get(name=armyId)
+        except all_rows.DoesNotExist:
+            return JsonResponse({"error": "Army was not found"}, status=404)
+        json_response = []
+        for row in all_rows:
+            operatives = row.operatives.all()
+            operativeses = []
+            abilitys = row.ability.all()
+            abilityses = []
+            for operative in operatives:
+                operativeses.append(operative.name)
+            for ability in abilitys:
+                abilityses.append(ability.name)
+            json_response.append({
+                'id': row.pk,
+                'name': row.name,
+                'faction': row.faction,
+                'operatives': operativeses,
+                'abilities': abilityses,
+            })
+        return JsonResponse(json_response, safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
 def operative(request):
     # Manejar la solicitud GET
     if request.method == 'GET':
