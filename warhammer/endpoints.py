@@ -68,28 +68,6 @@ def gun(request):
                     'rules': ruleses,
                 })
         # si no tiene nombre en el header devuelve todos
-        elif request.headers.get("gunId") != None:
-            gunId = request.headers.get("gunId")
-            try:
-                gun = Gun.objects.get(id=gunId)
-            except gun.DoesNotExist:
-                return JsonResponse({"error": "Gun was not found"}, status=404)
-            rules = gun.special_rule.all()
-            ruleses = []
-            for rule in rules:
-                ruleses.append(rule.name)
-            json_response = {
-                'id': gun.pk,
-                'name': gun.name,
-                'stats': {
-                    'attacks': gun.attacks,
-                    'ws': gun.ws,
-                    'dmg': gun.dmg,
-                    'critical_dmg': gun.dmg,
-                },
-                'rules': ruleses,
-            }
-        # si no tiene nombre en el header devuelve todos
         else:
             all_rows = Gun.objects.all()
             json_response = []
@@ -98,6 +76,30 @@ def gun(request):
         return JsonResponse(json_response, safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+def gunbyId(request,gunId):
+    if request.method == "GET":
+        try:
+            gun = Gun.objects.get(id=gunId)
+        except gun.DoesNotExist:
+            return JsonResponse({"error": "Gun was not found"}, status=404)
+        rules = gun.special_rule.all()
+        ruleses = []
+        for rule in rules:
+            ruleses.append(rule.name)
+        json_response = {
+            'id': gun.pk,
+            'name': gun.name,
+            'stats': {
+                'attacks': gun.attacks,
+                'ws': gun.ws,
+                'dmg': gun.dmg,
+                'critical_dmg': gun.dmg,
+            },
+            'rules': ruleses,
+        }
+        return JsonResponse(json_response, safe=False)
 
 
 def uniqueaction(request):
@@ -112,12 +114,6 @@ def uniqueaction(request):
             json_response = []
             for row in all_rows:
                 json_response.append(row)
-        elif request.headers.get("uniqueactionId"):
-            uniqueactionId = request.headers.get("uniqueactionId")
-            try:
-                all_rows = UniqueAction.objects.filter(pk=uniqueactionId)
-            except all_rows.DoesNotExist:
-                return JsonResponse({"error": "Uniqueaction was not found"},status=404)
         # si no tiene nombre o id en el header devuelve todos
         else:
             all_rows = UniqueAction.objects.all()
@@ -125,6 +121,17 @@ def uniqueaction(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
+
+
+def uniqueactionbyId(request,uniqueactionId):
+    if request.method == "GET":
+        try:
+            uniqueaction = UniqueAction.objects.get(pk=uniqueactionId)
+        except uniqueaction.DoesNotExist:
+            return JsonResponse({"error": "Uniqueaction was not found"}, status=404)
+        json_response=[]
+        json_response.append(uniqueaction)
+        return JsonResponse(json_response,safe=False)
 
 
 def specialrule(request):
@@ -135,16 +142,7 @@ def specialrule(request):
             try:
                 all_rows = SpecialRule.objects.filter(name=specialruleName)
             except all_rows.DoesNotExist:
-                return JsonResponse({"error": "Gun was not found"}, status=404)
-            json_response = []
-            for row in all_rows:
-                json_response.append(row)
-        elif request.headers.get("specialruleId") != None:
-            specialruleId = request.headers.get("specialruleId")
-            try:
-                all_rows = SpecialRule.objects.filter(pk=specialruleId)
-            except all_rows.DoesNotExist:
-                return JsonResponse({"error": "Gun was not found"}, status=404)
+                return JsonResponse({"error": "Specialrule was not found"}, status=404)
             json_response = []
             for row in all_rows:
                 json_response.append(row)
@@ -157,6 +155,17 @@ def specialrule(request):
         return JsonResponse(json_response, safe=False)
 
 
+def specialrulebyId(request,specialruleId):
+    if request.method == "GET":
+        try:
+            specialrule = SpecialRule.objects.get(pk=specialruleId)
+        except specialrule.DoesNotExist:
+            return JsonResponse({"error": "Specialrule was not found"}, status=404)
+        json_response = []
+        json_response.append(specialrule)
+        return JsonResponse(json_response,safe=False)
+
+
 def ability(request):
     if request.method == 'GET':
         # checkea si tiene nombre en el header y filtrar en caso positivo
@@ -165,16 +174,7 @@ def ability(request):
             try:
                 all_rows = Ability.objects.filter(name=abilityName)
             except all_rows.DoesNotExist:
-                return JsonResponse({"error": "Gun was not found"}, status=404)
-            json_response = []
-            for row in all_rows:
-                json_response.append(row)
-        elif request.headers.get("abilityId") != None:
-            abilityId = request.headers.get("abilityId")
-            try:
-                all_rows = Ability.objects.filter(pk=abilityId)
-            except all_rows.DoesNotExist:
-                return JsonResponse({"error": "Gun was not found"}, status=404)
+                return JsonResponse({"error": "Ability was not found"}, status=404)
             json_response = []
             for row in all_rows:
                 json_response.append(row)
@@ -185,3 +185,14 @@ def ability(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
+
+
+def abilitybyId(request,abilityId):
+    if request.method == "GET":
+        try:
+            ability = Ability.objects.get(pk=abilityId)
+        except ability.DoesNotExist:
+            return JsonResponse({"error": "Ability was not found"}, status=404)
+        json_response = []
+        json_response.append(ability)
+        JsonResponse(json_response,safe=False)
