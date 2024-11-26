@@ -18,24 +18,97 @@ def operative(request):
                 return JsonResponse({"error": "Operative was not found"}, status=404)
             json_response = []
             for row in all_rows:
-                json_response.append(row.to_json())
-        # si no tiene nombre en el header devuelve todos
-        elif request.headers.get("operativeId") != None:
-            operativeId = request.headers.get("operativeId")
-            try:
-                all_rows = Operative.objects.filter(name=operativeId)
-            except all_rows.DoesNotExist:
-                return JsonResponse({"error": "Operative was not found"}, status=404)
-            json_response = []
-            for row in all_rows:
-                json_response.append(row.to_json())
+                uniqueactions = row.unique_action.all()
+                uniqueactiones = []
+                guns = row.gun.all()
+                gunes = []
+                for gun in guns:
+                    gunes.append(gun.name)
+                for uniqueaction in uniqueactions:
+                    uniqueactiones.append(uniqueaction.name)
+                json_response.append({
+                    'id': row.pk,
+                    'name': row.name,
+                    'stats': {
+                        'movement': row.movement,
+                        'dash': row.dash,
+                        'apl': row.apl,
+                        'ga': row.ga,
+                        'df': row.df,
+                        'sv': row.sv,
+                        'w': row.w,
+                        'base': row.base,
+                    },
+                    'unique_actions': uniqueactiones,
+                    'guns': gunes,
+                })
         # si no tiene nombre en el header devuelve todos
         else:
             all_rows = Operative.objects.all()
             json_response = []
             for row in all_rows:
-                json_response.append(row.to_json())
+                uniqueactions = row.unique_action.all()
+                uniqueactiones = []
+                guns = row.gun.all()
+                gunes = []
+                for gun in guns:
+                    gunes.append(gun.name)
+                for uniqueaction in uniqueactions:
+                    uniqueactiones.append(uniqueaction.name)
+                json_response.append({
+                    'id': row.pk,
+                    'name': row.name,
+                    'stats': {
+                        'movement': row.movement,
+                        'dash': row.dash,
+                        'apl': row.apl,
+                        'ga': row.ga,
+                        'df': row.df,
+                        'sv': row.sv,
+                        'w': row.w,
+                        'base': row.base,
+                    },
+                    'unique_actions': uniqueactiones,
+                    'guns': gunes,
+                })
         return JsonResponse(json_response, safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+def operativebyId(request,operativeId):
+    if request.method == "GET":
+        try:
+            all_rows = Operative.objects.get(name=operativeId)
+        except all_rows.DoesNotExist:
+            return JsonResponse({"error": "Operative was not found"}, status=404)
+        json_response = []
+        for row in all_rows:
+            uniqueactions = row.unique_action.all()
+            uniqueactiones = []
+            guns = row.gun.all()
+            gunes = []
+            for gun in guns:
+                gunes.append(gun.name)
+            for uniqueaction in uniqueactions:
+                uniqueactiones.append(uniqueaction.name)
+            json_response.append({
+                'id': row.pk,
+                'name': row.name,
+                'stats': {
+                    'movement': row.movement,
+                    'dash': row.dash,
+                    'apl': row.apl,
+                    'ga': row.ga,
+                    'df': row.df,
+                    'sv': row.sv,
+                    'w': row.w,
+                    'base': row.base,
+                },
+                'unique_actions': uniqueactiones,
+                'guns': gunes,
+            })
+        return JsonResponse(json_response,safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
@@ -100,6 +173,8 @@ def gunbyId(request,gunId):
             'rules': ruleses,
         }
         return JsonResponse(json_response, safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def uniqueaction(request):
@@ -132,6 +207,8 @@ def uniqueactionbyId(request,uniqueactionId):
         json_response=[]
         json_response.append(uniqueaction)
         return JsonResponse(json_response,safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def specialrule(request):
@@ -164,6 +241,8 @@ def specialrulebyId(request,specialruleId):
         json_response = []
         json_response.append(specialrule)
         return JsonResponse(json_response,safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def ability(request):
@@ -196,3 +275,6 @@ def abilitybyId(request,abilityId):
         json_response = []
         json_response.append(ability)
         JsonResponse(json_response,safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+

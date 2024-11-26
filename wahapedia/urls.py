@@ -21,6 +21,7 @@ from warhammer import endpoints
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('operative/', endpoints.operative),
+    path('operative/<int:operativeId>', endpoints.operativebyId),
     path('gun/', endpoints.gun),
     path('gun/<int:gunId>', endpoints.gunbyId),
     path('uniqueaction/', endpoints.uniqueaction),
