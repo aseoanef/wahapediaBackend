@@ -216,7 +216,7 @@ def gun(request):
                         'attacks': row.attacks,
                         'ws': row.ws,
                         'dmg': row.dmg,
-                        'critical_dmg': row.dmg,
+                        'critical_dmg': row.critical_dmg,
                     },
                     'rules': ruleses,
                 })
