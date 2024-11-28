@@ -36,6 +36,6 @@ urlpatterns = [
     path('ability/<int:abilityId>', endpoints.abilitybyId),
     path('customarmy/', endpoints.customarmy),
     #path('customarmy/<int:customarmyId>/', admin.site.urls),
-    path('operativegun/', admin.site.urls),
+    path('operativegun/', endpoints.customopp),
     #path('operativegun/<int:operativegunId>/', admin.site.urls),
 ]
