@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy, OperativeGun
 from django.views.decorators.csrf import csrf_exempt
-
+import json
 
 def army(request):
     # Manejar la solicitud GET
@@ -356,9 +356,9 @@ def abilitybyId(request,abilityId):
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
-
+@csrf_exempt
 def getcustomarmy(request): #devuelve todos los custom opps
-    if request.method == "GET":
+    if request.method == "GET": #curl -X GET 127.0.0.1:8000/customarmy/
         all_rows = CustomArmy.objects.all()
         json_response = []
         for row in all_rows:
@@ -375,6 +375,24 @@ def getcustomarmy(request): #devuelve todos los custom opps
                 'operatives': result,
             })
         return JsonResponse(json_response, safe=False)
+    elif request.method=="POST": #curl -X POST --data {\"newArmyName\":\"nombre_army\"} 127.0.0.1:8000/customarmy/
+        try:
+            # Intentar cargar el JSON del cuerpo de la solicitud
+            body_json = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            # Obtener  el nombre de la nueva lista desde el cuerpo del JSON
+            json_newArmyName = body_json.get('newArmyName')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # Crear y guardar una nueva lista de compras
+        army = CustomArmy()
+        army.name = json_newArmyName.replace("_"," ")
+        army.save()
+        return JsonResponse({"uploaded": True}, status=201)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def customarmy(request,customarmyId): #devuelve un custom opps segun id
