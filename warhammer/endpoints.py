@@ -446,6 +446,10 @@ def customopp(request,operativegunId): #devuelve un custom opps segun id
             gunId = body_json.get('gunId')
         except KeyError:
             return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            gunIddel = body_json.get('gunIddel')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
         # Crear y guardar una nueva lista de compras
         if newname != None:
             row.name = newname.replace("_", " ")
@@ -457,6 +461,10 @@ def customopp(request,operativegunId): #devuelve un custom opps segun id
         if gunId != None:
             gun = Gun.objects.get(pk=gunId)
             row.gun.add(gun)
+            row.save()
+        if gunIddel != None:
+            gun = Gun.objects.get(pk=gunIddel)
+            row.gun.remove(gun)
             row.save()
         return JsonResponse({"uploaded": True}, status=201)
     elif request.method == "DELETE":
