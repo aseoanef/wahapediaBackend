@@ -1,4 +1,5 @@
 import json
+from msvcrt import putch
 
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy, OperativeGun
@@ -441,6 +442,10 @@ def customopp(request,operativegunId): #devuelve un custom opps segun id
             newname = body_json.get('newName')
         except KeyError:
             return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            gunId = body_json.get('gunId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
         # Crear y guardar una nueva lista de compras
         if newname != None:
             row.name = newname.replace("_", " ")
@@ -448,6 +453,10 @@ def customopp(request,operativegunId): #devuelve un custom opps segun id
         if oppId != None:
             opp = Operative.objects.get(pk=oppId)
             row.operative=opp
+            row.save()
+        if gunId != None:
+            gun = Gun.objects.get(pk=gunId)
+            row.gun.add(gun)
             row.save()
         return JsonResponse({"uploaded": True}, status=201)
     elif request.method == "DELETE":
@@ -457,3 +466,4 @@ def customopp(request,operativegunId): #devuelve un custom opps segun id
             return JsonResponse({'success': True, 'message': 'Operative deleted successfully'}, status=200)
         except OperativeGun.DoesNotExist:
             return JsonResponse({'error': 'Operative not found'}, status=404)
+
