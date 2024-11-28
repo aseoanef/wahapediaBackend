@@ -267,7 +267,7 @@ def attack(request,gunId):#metodo para simular un ataque de un arma por id
         ruleses = []
         dices=[]
         potentialdmg=0
-        for x in range(gun.attacks):#hacemos un loop para  titar los dados por cada ataque
+        for x in range(gun.attacks):#hacemos un loop para  tirar los dados por cada ataque
             roll=random.randint(1,6)#simulamos la tirada de 1d6 (un dado de 6 caras)
             if roll >= gun.ws: #comprobamos si da el ataque
                 if roll == 6: #si es crítico
