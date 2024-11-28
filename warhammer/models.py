@@ -79,7 +79,7 @@ class Army(models.Model):
 class CustomArmy(models.Model):
     name = models.CharField(max_length=240,null=False)
     army = models.ForeignKey('Army',on_delete=models.CASCADE)
-    operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
+    operative = models.ManyToManyField('OperativeGun')
 
 
 class OperativeGun(models.Model):

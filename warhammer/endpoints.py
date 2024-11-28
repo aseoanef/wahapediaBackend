@@ -1,7 +1,5 @@
-import json
-
 from django.http import JsonResponse
-from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
+from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -358,3 +356,12 @@ def abilitybyId(request,abilityId):
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
+
+def customarmy(request):
+    if request.method == "GET":
+        # checkea si tiene nombre en el header y filtrar en caso positivo
+        all_rows = CustomArmy.objects.all()
+        json_response = []
+        for row in all_rows:
+            json_response.append(row.to_json())
+        return JsonResponse(json_response, safe=False)
