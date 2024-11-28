@@ -394,8 +394,8 @@ def getcustomarmy(request): #devuelve todos los custom opps
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
-
-def customarmy(request,customarmyId): #devuelve un custom opps segun id
+@csrf_exempt
+def customarmy(request,customarmyId): # devuelve un custom opps según id
     if request.method == "GET":
         row = CustomArmy.objects.get(pk=customarmyId)
         json_response = []
@@ -412,6 +412,31 @@ def customarmy(request,customarmyId): #devuelve un custom opps segun id
             'operatives': listoperatives,
         })
         return JsonResponse(json_response, safe=False)
+    elif request.method == "PUT":
+        army = CustomArmy.objects.get(pk=customarmyId)
+        try:
+            body_json = json.loads(request.body) # Intentar cargar el JSON del cuerpo de la solicitud
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            oppId = body_json.get('operativeId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            newname = body_json.get('newName')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # Crear y guardar una nueva lista de compras
+        if newname != None:
+            army.name = newname.replace("_"," ")
+            army.save()
+        if oppId != None:
+            operative = OperativeGun.objects.get(pk=oppId)
+            army.operative.add(operative)
+            army.save()
+        return JsonResponse({"uploaded": True}, status=201)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 @csrf_exempt
