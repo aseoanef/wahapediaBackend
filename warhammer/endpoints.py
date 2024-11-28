@@ -367,7 +367,7 @@ def customarmy(request):
         return JsonResponse(json_response, safe=False)
 
 
-def customopp(request): #devuelve todos los custom opps
+def getcustomopp(request): #devuelve todos los custom opps
     if request.method == "GET":
         all_rows = OperativeGun.objects.all()
         json_response = []
@@ -383,6 +383,21 @@ def customopp(request): #devuelve todos los custom opps
             })
         return JsonResponse(json_response, safe=False)
 
+
+def customopp(request,operativegunId): #devuelve un custom opps segun id
+    if request.method == "GET":
+        row = OperativeGun.objects.get(pk=operativegunId)
+        json_response = []
+        guns = row.gun.all()
+        gunes = []
+        for gun in guns:
+            gunes.append(gun.name)
+        json_response.append({
+            'id': row.pk,
+            'name': row.name,
+            'guns': gunes,
+        })
+        return JsonResponse(json_response, safe=False)
 
 @csrf_exempt
 def addOperative(request): #deprecated
