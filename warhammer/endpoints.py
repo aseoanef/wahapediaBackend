@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy
+from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy, OperativeGun
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -357,11 +357,51 @@ def abilitybyId(request,abilityId):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
-def customarmy(request):
+def getcustomarmy(request): #devuelve todos los custom opps
     if request.method == "GET":
-        # checkea si tiene nombre en el header y filtrar en caso positivo
         all_rows = CustomArmy.objects.all()
         json_response = []
         for row in all_rows:
-            json_response.append(row.to_json())
+            operative = row.operative.all()
+            result={}
+            for operativ in operative:
+                result={
+                    "id":operativ.id,
+                    "name":operativ.name,
+                }
+            json_response.append({
+                'id': row.pk,
+                'name': row.name,
+                'operatives': result,
+            })
         return JsonResponse(json_response, safe=False)
+
+
+def customarmy(request,customarmyId): #devuelve un custom opps segun id
+    if request.method == "GET":
+        row = CustomArmy.objects.get(pk=customarmyId)
+        json_response = []
+        operatives= row.operative.all()
+        listoperatives = {}
+        for operative in operatives:
+            listoperatives={
+                "id":operative.id,
+                "name":operative.name,
+            }
+        json_response.append({
+            'id': row.pk,
+            'name': row.name,
+            'operatives': listoperatives,
+        })
+        return JsonResponse(json_response, safe=False)
+
+
+@csrf_exempt
+def addOperative(request): #deprecated
+    if request.method=="POST":
+        army = CustomArmy.objects.get(pk=1)
+        operative = OperativeGun.objects.get(pk=1)
+        #Add the gun to the rule
+        army.operative.add(operative)
+        army.save()
+        return JsonResponse(army.pk,safe=False)
