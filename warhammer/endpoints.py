@@ -56,12 +56,12 @@ def army(request):
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
-
+#estropeado
 def armybyId(request,armyId):
     # Manejar la solicitud GET
     if request.method == 'GET':
         try:
-            all_rows = Army.objects.get(name=armyId)
+            all_rows = Army.objects.get(pk=armyId)
         except all_rows.DoesNotExist:
             return JsonResponse({"error": "Army was not found"}, status=404)
         json_response = []
@@ -155,11 +155,11 @@ def operative(request):
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
-
+#estropeado
 def operativebyId(request,operativeId):
     if request.method == "GET":
         try:
-            all_rows = Operative.objects.get(name=operativeId)
+            all_rows = Operative.objects.get(pk=operativeId)
         except all_rows.DoesNotExist:
             return JsonResponse({"error": "Operative was not found"}, status=404)
         json_response = []
@@ -408,23 +408,52 @@ def getcustomopp(request): #devuelve todos los custom opps
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
-
+@csrf_exempt
 def customopp(request,operativegunId): #devuelve un custom opps segun id
     if request.method == "GET":
         row = OperativeGun.objects.get(pk=operativegunId)
         json_response = []
         guns = row.gun.all()
-        opps = row.operative.all()
         gunes = []
-        listopps = []
+        opp = ' '
+        if row.operative != None:
+            opp = row.operative.name
         for gun in guns:
             gunes.append(gun.name)
-        for opp in listopps:
-            opps.append(opp.name)
         json_response.append({
             'id': row.pk,
             'name': row.name,
-            'opp_name': opps,
+            'opp_name': opp,
             'guns': gunes,
         })
         return JsonResponse(json_response, safe=False)
+    elif request.method == "PUT":
+        row = OperativeGun.objects.get(pk=operativegunId)
+        try:
+            body_json = json.loads(request.body)  # Intentar cargar el JSON del cuerpo de la solicitud
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            oppId = body_json.get('operativeId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            newname = body_json.get('newName')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # Crear y guardar una nueva lista de compras
+        if newname != None:
+            row.name = newname.replace("_", " ")
+            row.save()
+        if oppId != None:
+            opp = Operative.objects.get(pk=oppId)
+            row.operative=opp
+            row.save()
+        return JsonResponse({"uploaded": True}, status=201)
+    elif request.method == "DELETE":
+        try:
+            opp = OperativeGun.objects.get(pk=operativegunId)
+            opp.delete()
+            return JsonResponse({'success': True, 'message': 'Operative deleted successfully'}, status=200)
+        except OperativeGun.DoesNotExist:
+            return JsonResponse({'error': 'Operative not found'}, status=404)
