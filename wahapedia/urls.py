@@ -38,6 +38,4 @@ urlpatterns = [
     path('customarmy/<int:customarmyId>/', endpoints.customarmy),
     path('operativegun/', admin.site.urls),
     #path('operativegun/<int:operativegunId>/', admin.site.urls),
-
-    path('addarmy/',endpoints.addOperative),
 ]

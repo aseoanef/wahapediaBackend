@@ -356,6 +356,7 @@ def abilitybyId(request,abilityId):
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
+
 @csrf_exempt
 def getcustomarmy(request): #devuelve todos los custom opps
     if request.method == "GET": #curl -X GET 127.0.0.1:8000/customarmy/
@@ -393,6 +394,7 @@ def getcustomarmy(request): #devuelve todos los custom opps
         return JsonResponse({"uploaded": True}, status=201)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
 
 @csrf_exempt
 def customarmy(request,customarmyId): # devuelve un custom opps según id
@@ -435,16 +437,12 @@ def customarmy(request,customarmyId): # devuelve un custom opps según id
             army.operative.add(operative)
             army.save()
         return JsonResponse({"uploaded": True}, status=201)
+    elif request.method == "DELETE":
+        try:
+            army = CustomArmy.objects.get(pk=customarmyId)
+            army.delete()
+            return JsonResponse({'success': True, 'message': 'User deleted successfully'}, status=200)
+        except CustomArmy.DoesNotExist:
+            return JsonResponse({'error':'Army not found'}, status=404)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
-
-
-@csrf_exempt
-def addOperative(request): #deprecated
-    if request.method=="POST":
-        army = CustomArmy.objects.get(pk=1)
-        operative = OperativeGun.objects.get(pk=1)
-        #Add the gun to the rule
-        army.operative.add(operative)
-        army.save()
-        return JsonResponse(army.pk,safe=False)
