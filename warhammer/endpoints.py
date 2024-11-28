@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy, OperativeGun
 from django.views.decorators.csrf import csrf_exempt
@@ -367,21 +369,44 @@ def customarmy(request):
         return JsonResponse(json_response, safe=False)
 
 
+@csrf_exempt
 def getcustomopp(request): #devuelve todos los custom opps
-    if request.method == "GET":
+    if request.method == "GET": #curl -X GET 127.0.0.1:8000/operativegun/
         all_rows = OperativeGun.objects.all()
         json_response = []
         for row in all_rows:
             guns = row.gun.all()
             gunes = []
+            opp= ' '
+            if row.operative != None:
+                opp = row.operative.name
             for gun in guns:
                 gunes.append(gun.name)
             json_response.append({
                 'id': row.pk,
                 'name': row.name,
+                'opp_name': opp,
                 'guns': gunes,
             })
         return JsonResponse(json_response, safe=False)
+    elif request.method=="POST": #curl -X POST --data {\"newOppName\":\"nombre_operative\"} 127.0.0.1:8000/operativegun/
+        try:
+            # Intentar cargar el JSON del cuerpo de la solicitud
+            body_json = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            # Obtener  el nombre de la nueva lista desde el cuerpo del JSON
+            json_newOppName = body_json.get('newOppName')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # Crear y guardar una nueva lista de compras
+        newcustomopp = OperativeGun()
+        newcustomopp.name = json_newOppName.replace("_"," ")
+        newcustomopp.save()
+        return JsonResponse({"uploaded": True}, status=201)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def customopp(request,operativegunId): #devuelve un custom opps segun id
@@ -389,22 +414,17 @@ def customopp(request,operativegunId): #devuelve un custom opps segun id
         row = OperativeGun.objects.get(pk=operativegunId)
         json_response = []
         guns = row.gun.all()
+        opps = row.operative.all()
         gunes = []
+        listopps = []
         for gun in guns:
             gunes.append(gun.name)
+        for opp in listopps:
+            opps.append(opp.name)
         json_response.append({
             'id': row.pk,
             'name': row.name,
+            'opp_name': opps,
             'guns': gunes,
         })
         return JsonResponse(json_response, safe=False)
-
-@csrf_exempt
-def addOperative(request): #deprecated
-    if request.method=="POST":
-        operative = OperativeGun.objects.get(pk=1)
-        gun = Gun.objects.get(pk=1)
-        #Add the gun to the rule
-        operative.gun.add(gun)
-        operative.save()
-        return JsonResponse(operative.pk,safe=False)
