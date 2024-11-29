@@ -409,6 +409,7 @@ def getcustomopp(request): #devuelve todos los custom opps
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
+
 @csrf_exempt
 def customopp(request,operativegunId): #devuelve un custom opps segun id
     if request.method == "GET":
