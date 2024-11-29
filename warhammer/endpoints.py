@@ -61,26 +61,25 @@ def armybyId(request,armyId):
     # Manejar la solicitud GET
     if request.method == 'GET':
         try:
-            all_rows = Army.objects.get(name=armyId)
+            all_rows = Army.objects.get(pk=armyId)
         except all_rows.DoesNotExist:
             return JsonResponse({"error": "Army was not found"}, status=404)
         json_response = []
-        for row in all_rows:
-            operatives = row.operatives.all()
-            operativeses = []
-            abilitys = row.ability.all()
-            abilityses = []
-            for operative in operatives:
-                operativeses.append(operative.name)
-            for ability in abilitys:
-                abilityses.append(ability.name)
-            json_response.append({
-                'id': row.pk,
-                'name': row.name,
-                'faction': row.faction,
-                'operatives': operativeses,
-                'abilities': abilityses,
-            })
+        operatives = all_rows.operatives.all()
+        operativeses = []
+        abilitys = all_rows.ability.all()
+        abilityses = []
+        for operative in operatives:
+            operativeses.append(operative.name)
+        for ability in abilitys:
+            abilityses.append(ability.name)
+        json_response.append({
+            'id': all_rows.pk,
+            'name': all_rows.name,
+            'faction': all_rows.faction,
+            'operatives': operativeses,
+            'abilities': abilityses,
+        })
         return JsonResponse(json_response, safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
@@ -159,35 +158,34 @@ def operative(request):
 def operativebyId(request,operativeId):
     if request.method == "GET":
         try:
-            all_rows = Operative.objects.get(name=operativeId)
+            all_rows = Operative.objects.get(pk=operativeId)
         except all_rows.DoesNotExist:
             return JsonResponse({"error": "Operative was not found"}, status=404)
         json_response = []
-        for row in all_rows:
-            uniqueactions = row.unique_action.all()
-            uniqueactiones = []
-            guns = row.gun.all()
-            gunes = []
-            for gun in guns:
-                gunes.append(gun.name)
-            for uniqueaction in uniqueactions:
-                uniqueactiones.append(uniqueaction.name)
-            json_response.append({
-                'id': row.pk,
-                'name': row.name,
-                'stats': {
-                    'movement': row.movement,
-                    'dash': row.dash,
-                    'apl': row.apl,
-                    'ga': row.ga,
-                    'df': row.df,
-                    'sv': row.sv,
-                    'w': row.w,
-                    'base': row.base,
-                },
-                'unique_actions': uniqueactiones,
-                'guns': gunes,
-            })
+        uniqueactions = all_rows.unique_action.all()
+        uniqueactiones = []
+        guns = all_rows.gun.all()
+        gunes = []
+        for gun in guns:
+            gunes.append(gun.name)
+        for uniqueaction in uniqueactions:
+            uniqueactiones.append(uniqueaction.name)
+        json_response.append({
+            'id': all_rows.pk,
+            'name': all_rows.name,
+            'stats': {
+                'movement': all_rows.movement,
+                'dash': all_rows.dash,
+                'apl': all_rows.apl,
+                'ga': all_rows.ga,
+                'df': all_rows.df,
+                'sv': all_rows.sv,
+                'w': all_rows.w,
+                'base': all_rows.base,
+            },
+            'unique_actions': uniqueactiones,
+            'guns': gunes,
+        })
         return JsonResponse(json_response,safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
@@ -285,7 +283,7 @@ def uniqueactionbyId(request,uniqueactionId):
         except uniqueaction.DoesNotExist:
             return JsonResponse({"error": "Uniqueaction was not found"}, status=404)
         json_response=[]
-        json_response.append(uniqueaction)
+        json_response.append(uniqueaction.to_json())
         return JsonResponse(json_response,safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
@@ -353,8 +351,8 @@ def abilitybyId(request,abilityId):
         except ability.DoesNotExist:
             return JsonResponse({"error": "Ability was not found"}, status=404)
         json_response = []
-        json_response.append(ability)
-        JsonResponse(json_response,safe=False)
+        json_response.append(ability.to_json())
+        return JsonResponse(json_response,safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
