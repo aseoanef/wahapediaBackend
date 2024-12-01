@@ -292,6 +292,7 @@ def gunbyId(request,gunId):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def uniqueaction(request):
     if request.method == 'GET':
         # checkea si tiene nombre en el header y filtrar en caso positivo
@@ -311,8 +312,24 @@ def uniqueaction(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
+    elif request.method == "POST":  #curl -X POST --data {\"name\":\"Omnispex\",\"description\":\"Select_one_friendly_HUNTER_CLADE_operative_Visible_to_and_within_of_this_operative,_then_select_one_enemy_operative._Until_the_end_of_the_Turning_Point,_each_time_that_friendly_operative_makes_a_shooting_attack,_for_that_shooting_attack:_Areas_of_smoke_have_no_effect_when_determining_Line_of_Sight_to_that_enemy_operative._That_enemy_operative_is_not_Obscured._If_that_enemy_operative_is_the_target,_that_friendly_operative’s_ranged_weapons_have_the_No_Cover_special_rule._This_operative_cannot_perform_this_action_while_within_Engagement_Range_of_an_enemy_operative.\",\"cost\":1} http://127.0.0.1:8000/uniqueaction/
+        try:
+            body_json = json.loads(request.body)
+            name = body_json.get('name').replace("_", " ")
+            description = body_json.get('description').replace("_", " ")
+            cost = body_json.get('cost')
+            if not name or not description:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            new_unique_action = UniqueAction(name=name, description=description)
+            if cost != None:
+                new_unique_action.cost = cost
+            new_unique_action.save()
+            return JsonResponse({'success': True, 'unique_action': new_unique_action.to_json()}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format in request body'}, status=400)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
 
 def uniqueactionbyId(request,uniqueactionId):
     if request.method == "GET":
