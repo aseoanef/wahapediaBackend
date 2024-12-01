@@ -191,6 +191,7 @@ def operativebyId(request,operativeId):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def gun(request):
     # Manejar la solicitud GET
     if request.method == 'GET':
@@ -225,6 +226,21 @@ def gun(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
+    elif request.method == "POST":  #curl -X POST --data {\"name\":\"Galvanic_rifle\",\"attacks\":4,\"ws\":3,\"dmg\":3,\"critical_dmg\":4} http://127.0.0.1:8000/gun/
+        try:
+            body_json = json.loads(request.body)
+            name = body_json.get('name').replace("_", " ")
+            attacks = body_json.get('attacks')
+            ws = body_json.get('ws')
+            dmg = body_json.get('dmg')
+            critical_dmg =body_json.get('critical_dmg')
+            if not name or not attacks or not ws or not dmg or not critical_dmg:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            new_gun = Gun(name=name, attacks=attacks, ws=ws , dmg=dmg, critical_dmg=critical_dmg)
+            new_gun.save()
+            return JsonResponse({'success': True, 'gun': new_gun.to_json()}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format in request body'}, status=400)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
