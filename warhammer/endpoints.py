@@ -1,4 +1,5 @@
 import json
+from webbrowser import Opera
 
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
@@ -85,6 +86,7 @@ def armybyId(request,armyId):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def operative(request):
     # Manejar la solicitud GET
     if request.method == 'GET':
@@ -151,6 +153,25 @@ def operative(request):
                     'guns': gunes,
                 })
         return JsonResponse(json_response, safe=False)
+    elif request.method == "POST":  #curl -X POST --data {\"name\":\"Skitarii_Ranger_Marksman\",\"movement\":3,\"dash\":2,\"apl\":2,\"ga\":1,\"df\":3,\"sv\":4,\"w\":7,\"base\":25} http://127.0.0.1:8000/operative/
+        try:
+            body_json = json.loads(request.body)
+            name = body_json.get('name').replace("_", " ")
+            movement = body_json.get('movement')
+            dash = body_json.get('dash')
+            apl = body_json.get('apl')
+            ga = body_json.get('ga')
+            df = body_json.get('df')
+            sv = body_json.get('sv')
+            w = body_json.get('w')
+            base = body_json.get('base')
+            if not name or not movement or not dash or not apl or not ga or not df or not sv or not w or not base:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            new_opp = Operative(name=name, movement=movement, dash=dash, apl=apl, ga=ga, df=df, sv=sv, w=w, base=base)
+            new_opp.save()
+            return JsonResponse({'success': True, 'operative': new_opp.to_json()}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format in request body'}, status=400)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
