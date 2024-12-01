@@ -91,14 +91,14 @@ class Army(models.Model):
 
 class CustomArmy(models.Model):
     name = models.CharField(max_length=240,null=False)
-    army = models.ForeignKey('Army',on_delete=models.CASCADE)
-    operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
+    army = models.ForeignKey('Army',on_delete=models.CASCADE,null=True,blank=True)
+    operative = models.ManyToManyField('OperativeGun',null=True,blank=True)
 
 
 class OperativeGun(models.Model):
     name = models.CharField(max_length=250,null=True,blank=True)
-    operative = models.ForeignKey('Operative',on_delete=models.CASCADE)
-    gun = models.ForeignKey('Gun',on_delete=models.CASCADE)
+    operative = models.ForeignKey('Operative',on_delete=models.CASCADE,null=True,blank=True)
+    gun = models.ManyToManyField('Gun',null=True,blank=True)
 
 
 class Ability(models.Model):

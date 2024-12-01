@@ -1,9 +1,9 @@
-import json
 import random
 from django.db import IntegrityError
 from django.http import JsonResponse
-from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
+from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army, CustomArmy, OperativeGun
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 @csrf_exempt
@@ -302,7 +302,7 @@ def gun(request):
                         'attacks': row.attacks,
                         'ws': row.ws,
                         'dmg': row.dmg,
-                        'critical_dmg': row.critical_dmg,
+                        'critical_dmg': row.dmg,
                     },
                     'rules': ruleses,
                 })
@@ -564,5 +564,96 @@ def abilitybyId(request,abilityId):
         json_response = []
         json_response.append(ability.to_json())
         return JsonResponse(json_response,safe=False)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+@csrf_exempt
+def getcustomarmy(request): #devuelve todos los custom opps
+    if request.method == "GET": #curl -X GET 127.0.0.1:8000/customarmy/
+        all_rows = CustomArmy.objects.all()
+        json_response = []
+        for row in all_rows:
+            operative = row.operative.all()
+            result={}
+            for operativ in operative:
+                result={
+                    "id":operativ.id,
+                    "name":operativ.name,
+                }
+            json_response.append({
+                'id': row.pk,
+                'name': row.name,
+                'operatives': result,
+            })
+        return JsonResponse(json_response, safe=False)
+    elif request.method=="POST": #curl -X POST --data {\"newArmyName\":\"nombre_army\"} 127.0.0.1:8000/customarmy/
+        try:
+            # Intentar cargar el JSON del cuerpo de la solicitud
+            body_json = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            # Obtener  el nombre de la nueva lista desde el cuerpo del JSON
+            json_newArmyName = body_json.get('newArmyName')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # Crear y guardar una nueva lista de compras
+        army = CustomArmy()
+        army.name = json_newArmyName.replace("_"," ")
+        army.save()
+        return JsonResponse({"uploaded": True}, status=201)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+@csrf_exempt
+def customarmy(request,customarmyId): # devuelve un custom opps según id
+    if request.method == "GET":
+        row = CustomArmy.objects.get(pk=customarmyId)
+        json_response = []
+        operatives= row.operative.all()
+        listoperatives = {}
+        for operative in operatives:
+            listoperatives={
+                "id":operative.id,
+                "name":operative.name,
+            }
+        json_response.append({
+            'id': row.pk,
+            'name': row.name,
+            'operatives': listoperatives,
+        })
+        return JsonResponse(json_response, safe=False)
+    elif request.method == "PUT":
+        army = CustomArmy.objects.get(pk=customarmyId)
+        try:
+            body_json = json.loads(request.body) # Intentar cargar el JSON del cuerpo de la solicitud
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            oppId = body_json.get('operativeId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            newname = body_json.get('newName')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # Crear y guardar una nueva lista de compras
+        if newname != None:
+            army.name = newname.replace("_"," ")
+            army.save()
+        if oppId != None:
+            operative = OperativeGun.objects.get(pk=oppId)
+            army.operative.add(operative)
+            army.save()
+        return JsonResponse({"uploaded": True}, status=201)
+    elif request.method == "DELETE":
+        try:
+            army = CustomArmy.objects.get(pk=customarmyId)
+            army.delete()
+            return JsonResponse({'success': True, 'message': 'User deleted successfully'}, status=200)
+        except CustomArmy.DoesNotExist:
+            return JsonResponse({'error':'Army not found'}, status=404)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
