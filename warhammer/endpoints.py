@@ -75,6 +75,7 @@ def army(request):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def armybyId(request,armyId):
     # Manejar la solicitud GET
     if request.method == 'GET':
@@ -99,6 +100,30 @@ def armybyId(request,armyId):
             'abilities': abilityses,
         })
         return JsonResponse(json_response, safe=False)
+    elif request.method == "PUT":  #curl -X PUT --data {\"operativeId\":2,\"abilityId\":2} http://127.0.0.1:8000/army/2/
+        row = Army.objects.get(pk=armyId)
+        try:
+            body_json = json.loads(request.body)  # Intentar cargar el JSON del cuerpo de la solicitud
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            oppId = body_json.get('operativeId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            abilityId = body_json.get('abilityId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # guardar los datos en la army
+        if oppId != None:
+            opp = Operative.objects.get(pk=oppId)
+            row.operatives.add(opp)
+            row.save()
+        if abilityId != None:
+            ability = Ability.objects.get(pk=abilityId)
+            row.ability.add(ability)
+            row.save()
+        return JsonResponse({"uploaded": True}, status=201)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
@@ -193,6 +218,7 @@ def operative(request):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def operativebyId(request,operativeId):
     if request.method == "GET":
         try:
@@ -225,6 +251,30 @@ def operativebyId(request,operativeId):
             'guns': gunes,
         })
         return JsonResponse(json_response,safe=False)
+    elif request.method == "PUT": #curl -X PUT --data {\"gunId\":3,\"uniqueactionId\":2} http://127.0.0.1:8000/operative/2/
+        row = Operative.objects.get(pk=operativeId)
+        try:
+            body_json = json.loads(request.body)  # Intentar cargar el JSON del cuerpo de la solicitud
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            gunId = body_json.get('gunId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        try:
+            uniqueactionId = body_json.get('uniqueactionId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # guardar los datos en el operative
+        if uniqueactionId != None:
+            uniqueaction = UniqueAction.objects.get(pk=uniqueactionId)
+            row.unique_action.add(uniqueaction)
+            row.save()
+        if gunId != None:
+            gun = Gun.objects.get(pk=gunId)
+            row.gun.add(gun)
+            row.save()
+        return JsonResponse({"uploaded": True}, status=201)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
@@ -283,6 +333,7 @@ def gun(request):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def gunbyId(request,gunId):
     if request.method == "GET":
         try:
@@ -305,6 +356,22 @@ def gunbyId(request,gunId):
             'rules': ruleses,
         }
         return JsonResponse(json_response, safe=False)
+    elif request.method == "PUT": #curl -X PUT --data {\"specialruleId\":3} http://127.0.0.1:8000/gun/3/
+        row = Gun.objects.get(pk=gunId)
+        try:
+            body_json = json.loads(request.body)  # Intentar cargar el JSON del cuerpo de la solicitud
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        try:
+            specialruleId = body_json.get('specialruleId')
+        except KeyError:
+            return JsonResponse({"error": "Missing parameter in request"}, status=400)
+        # guardar la special rule en la gun
+        if specialruleId != None:
+            specialrule = SpecialRule.objects.get(pk=specialruleId)
+            row.special_rule.add(specialrule)
+            row.save()
+        return JsonResponse({"uploaded": True}, status=201)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 

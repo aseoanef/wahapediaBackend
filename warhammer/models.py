@@ -42,6 +42,7 @@ class UniqueAction(models.Model):
             "description": self.description,
         }
 
+
 class Gun(models.Model):
     name = models.CharField(max_length=240,)
     attacks = models.IntegerField()
