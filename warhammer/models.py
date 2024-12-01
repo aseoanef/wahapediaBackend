@@ -34,6 +34,13 @@ class UniqueAction(models.Model):
     name = models.CharField(max_length=240,)
     cost = models.IntegerField(default=1,)
     description = models.CharField(max_length=1000,)
+    def to_json(self):
+        return{
+            "id": self.pk,
+            "name": self.name,
+            "cost": self.cost,
+            "description": self.description,
+        }
 
 
 class Gun(models.Model):
@@ -70,10 +77,16 @@ class SpecialRule(models.Model):
 
 
 class Army(models.Model):
-    name = models.CharField(max_length=240,null=False,)
+    name = models.CharField(max_length=240,null=False,unique=True)
     operatives = models.ManyToManyField('Operative')
-    ability = models.ForeignKey('Ability', blank=True, on_delete=models.DO_NOTHING)
+    ability = models.ManyToManyField('Ability',)
     faction = models.CharField(max_length=240,)
+    def to_json(self):
+        return{
+            "id": self.pk,
+            "name": self.name,
+            "faction": self.faction,
+        }
 
 
 class CustomArmy(models.Model):
@@ -92,3 +105,10 @@ class Ability(models.Model):
     name = models.CharField(max_length=240,)
     description = models.CharField(max_length=1000)
     cost = models.IntegerField()
+    def to_json(self):
+        return{
+            "id": self.pk,
+            "name": self.name,
+            "cost": self.cost,
+            "description": self.description,
+        }
