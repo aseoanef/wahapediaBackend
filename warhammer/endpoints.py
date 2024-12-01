@@ -1,6 +1,7 @@
-from django.http import JsonResponse
+import random
 from django.db import IntegrityError
-from .models import Operative, Gun, SpecialRule, UniqueAction, Ability, Army, CustomArmy, OperativeGun
+from django.http import JsonResponse
+from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army, CustomArmy, OperativeGun
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -370,6 +371,43 @@ def gunbyId(request,gunId):
             row.special_rule.add(specialrule)
             row.save()
         return JsonResponse({"uploaded": True}, status=201)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+def attack(request,gunId):#metodo para simular un ataque de un arma por id
+    if request.method == "GET":
+        try:
+            gun = Gun.objects.get(id=gunId)
+        except gun.DoesNotExist:
+            return JsonResponse({"error": "Gun was not found"}, status=404)
+        rules = gun.special_rule.all()
+        ruleses = []
+        dices=[]
+        potentialdmg=0
+        for x in range(gun.attacks):#hacemos un loop para  tirar los dados por cada ataque
+            roll=random.randint(1,6)#simulamos la tirada de 1d6 (un dado de 6 caras)
+            if roll >= gun.ws: #comprobamos si da el ataque
+                if roll == 6: #si es crítico
+                    potentialdmg+=gun.critical_dmg #sumamos el daño de critico
+                potentialdmg+=gun.dmg #sumamos el daño de critico
+            dices.append(roll) #guardamos todos los dados por si alguna habilidad se activa aunque falle el ataque
+        for rule in rules:
+            ruleses.append(rule.name) #añadimos todas las reglas que competen para facil acceso
+        json_response = { #fabricamos la respuesta
+            'name': gun.name,
+            'result': {
+                'attacks': dices,
+                'max_dmg':potentialdmg,
+            },
+            'stats':{
+                'ws/bs':gun.ws,
+                'dmg': gun.dmg,
+                'critical_dmg': gun.critical_dmg,
+            },
+            'rules': ruleses,
+        }
+        return JsonResponse(json_response, safe=False)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
