@@ -274,7 +274,8 @@ def uniqueaction(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
-
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 def uniqueactionbyId(request,uniqueactionId):
     if request.method == "GET":
@@ -289,6 +290,7 @@ def uniqueactionbyId(request,uniqueactionId):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def specialrule(request):
     if request.method == 'GET':
         # checkea si tiene nombre en el header y filtrar en caso positivo
@@ -308,6 +310,23 @@ def specialrule(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
+    elif request.method == "POST": #$ curl -X POST --data {\"name\":\"stun\",\"description\":\"stunea_neno\",\"modifier\":2} http://127.0.0.1:8000/specialrule/
+        try:
+            body_json = json.loads(request.body)
+            name = body_json.get('name')
+            description = body_json.get('description').replace("_"," ")
+            modifier = body_json.get('modifier')
+            if not name or not description:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            new_special_rule = SpecialRule(name=name,description=description)
+            if modifier != None:
+                new_special_rule.modifier=modifier
+            new_special_rule.save()
+            return JsonResponse({'success': True, 'rule': new_special_rule.to_json()}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format in request body'}, status=400)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def specialrulebyId(request,specialruleId):
@@ -323,6 +342,7 @@ def specialrulebyId(request,specialruleId):
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
+@csrf_exempt
 def ability(request):
     if request.method == 'GET':
         # checkea si tiene nombre en el header y filtrar en caso positivo
@@ -342,6 +362,23 @@ def ability(request):
             for row in all_rows:
                 json_response.append(row.to_json())
         return JsonResponse(json_response, safe=False)
+    elif request.method == "POST":  #curl -X POST --data {\"name\":\"Conqueror_Imperative\",\"description\":\"Optimisation:_Each_time_a_friendly_HUNTER_CLADE_operative_fights_in_combat,_in_the_Roll_Attack_Dice_step_of_that_combat,_you_can_re-roll_one_of_your_attack_dice.\",\"cost\":2} http://127.0.0.1:8000/ability/
+        try:
+            body_json = json.loads(request.body)
+            name = body_json.get('name').replace("_", " ")
+            description = body_json.get('description').replace("_", " ")
+            cost = body_json.get('cost')
+            if not name or not description:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            new_ability = Ability(name=name, description=description)
+            if cost != None:
+                new_ability.cost = cost
+            new_ability.save()
+            return JsonResponse({'success': True, 'rule': new_ability.to_json()}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format in request body'}, status=400)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
 
 def abilitybyId(request,abilityId):
