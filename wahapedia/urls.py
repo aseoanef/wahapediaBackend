@@ -21,18 +21,18 @@ from warhammer import endpoints
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('army/',endpoints.army),
-    path('army/<int:armyId>',endpoints.armybyId),#post
+    path('army/<int:armyId>/',endpoints.armybyId),
     path('operative/', endpoints.operative),
-    path('operative/<int:operativeId>', endpoints.operativebyId),#post
+    path('operative/<int:operativeId>/', endpoints.operativebyId),
     path('gun/', endpoints.gun),
-    path('gun/<int:gunId>', endpoints.gunbyId),#post
+    path('gun/<int:gunId>/', endpoints.gunbyId),
     path('uniqueaction/', endpoints.uniqueaction),
-    path('uniqueaction/<int:uniqueactionId>', endpoints.uniqueactionbyId),#post
+    path('uniqueaction/<int:uniqueactionId>/', endpoints.uniqueactionbyId),
     path('attack/<int:gunId>/', endpoints.attack),
     path('specialrule/', endpoints.specialrule),
-    path('specialrule/<int:specialruleId>', endpoints.specialrulebyId),#post
+    path('specialrule/<int:specialruleId>/', endpoints.specialrulebyId),
     path('ability/', endpoints.ability),
-    path('ability/<int:abilityId>', endpoints.abilitybyId),#post
+    path('ability/<int:abilityId>/', endpoints.abilitybyId),
     path('customarmy/', admin.site.urls),
     #path('customarmy/<int:customarmyId>/', admin.site.urls),#post get put delete
     path('operativegun/', admin.site.urls),
