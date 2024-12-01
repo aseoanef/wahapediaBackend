@@ -76,10 +76,16 @@ class SpecialRule(models.Model):
 
 
 class Army(models.Model):
-    name = models.CharField(max_length=240,null=False,)
+    name = models.CharField(max_length=240,null=False,unique=True)
     operatives = models.ManyToManyField('Operative')
-    ability = models.ManyToManyField('Ability', blank=True,)
+    ability = models.ManyToManyField('Ability',)
     faction = models.CharField(max_length=240,)
+    def to_json(self):
+        return{
+            "id": self.pk,
+            "name": self.name,
+            "faction": self.faction,
+        }
 
 
 class CustomArmy(models.Model):

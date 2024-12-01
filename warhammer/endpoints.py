@@ -1,11 +1,13 @@
 import json
 from webbrowser import Opera
 
+from django.db import IntegrityError
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
 from django.views.decorators.csrf import csrf_exempt
 
 
+@csrf_exempt
 def army(request):
     # Manejar la solicitud GET
     if request.method == 'GET':
@@ -54,6 +56,21 @@ def army(request):
                     'abilities': abilityses,
                 })
         return JsonResponse(json_response, safe=False)
+    elif request.method == "POST": #curl -X POST --data {\"name\":\"Hunter_Clade\",\"faction\":\"Adeptus_mechanicus\"} http://127.0.0.1:8000/army/
+        try:
+            body_json = json.loads(request.body)
+            name = body_json.get('name').replace("_"," ")
+            faction = body_json.get('faction').replace("_"," ")
+            if not name or not faction:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            try:
+                new_army = Army(name=name,faction=faction)
+                new_army.save()
+                return JsonResponse({'success': True, 'rule': new_army.to_json()}, status=201)
+            except IntegrityError:
+                return JsonResponse({'error':'Army with this name already exists'},status=409)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format in request body'}, status=400)
     else:
         return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
 
