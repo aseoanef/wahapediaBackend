@@ -26,6 +26,7 @@ urlpatterns = [
     path('operative/<int:operativeId>/', endpoints.operativebyId),
     path('gun/', endpoints.gun),
     path('gun/<int:gunId>/', endpoints.gunbyId),
+    path('attack/<int:gunId>/', admin.site.urls),
     path('uniqueaction/', endpoints.uniqueaction),
     path('uniqueaction/<int:uniqueactionId>/', endpoints.uniqueactionbyId),
     path('specialrule/', endpoints.specialrule),
@@ -34,6 +35,6 @@ urlpatterns = [
     path('ability/<int:abilityId>/', endpoints.abilitybyId),
     path('customarmy/', endpoints.getcustomarmy),
     path('customarmy/<int:customarmyId>/', endpoints.customarmy), #get put delete post
-    #path('operativegun/', admin.site.urls),
-    #path('operativegun/<int:operativegunId>/', admin.site.urls), #post get put delete post
+    path('operativegun/', endpoints.getcustomopp),
+    path('operativegun/<int:operativegunId>/', endpoints.customopp), #post get put delete post
 ]
