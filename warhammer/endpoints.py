@@ -1,6 +1,4 @@
 import json
-from webbrowser import Opera
-
 from django.db import IntegrityError
 from django.http import JsonResponse
 from .models import Operative, Gun, SpecialRule, UniqueAction, Ability , Army
