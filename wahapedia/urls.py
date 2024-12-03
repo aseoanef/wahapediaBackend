@@ -19,22 +19,22 @@ from django.urls import path
 from warhammer import endpoints
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('army/',endpoints.army),
-    path('army/<int:armyId>/',endpoints.armybyId),
-    path('operative/', endpoints.operative),
-    path('operative/<int:operativeId>/', endpoints.operativebyId),
-    path('gun/', endpoints.gun),
-    path('gun/<int:gunId>/', endpoints.gunbyId),
-    path('attack/<int:gunId>/', admin.site.urls),
-    path('uniqueaction/', endpoints.uniqueaction),
-    path('uniqueaction/<int:uniqueactionId>/', endpoints.uniqueactionbyId),
-    path('specialrule/', endpoints.specialrule),
-    path('specialrule/<int:specialruleId>/', endpoints.specialrulebyId),
-    path('ability/', endpoints.ability),
-    path('ability/<int:abilityId>/', endpoints.abilitybyId),
-    path('customarmy/', endpoints.getcustomarmy),
-    path('customarmy/<int:customarmyId>/', endpoints.customarmy), #get put delete post
-    path('operativegun/', endpoints.getcustomopp),
-    path('operativegun/<int:operativegunId>/', endpoints.customopp), #post get put delete post
+    path('admin/', admin.site.urls), #editar la pantalla de admin en admin.py
+    path('army/',endpoints.army), # POST GET
+    path('army/<int:armyId>/',endpoints.armybyId), #GET PUT
+    path('operative/', endpoints.operative), #GET POST
+    path('operative/<int:operativeId>/', endpoints.operativebyId), #GET PUT
+    path('gun/', endpoints.gun), #GET POST
+    path('gun/<int:gunId>/', endpoints.gunbyId), #GET PUT
+    path('attack/<int:gunId>/', endpoints.attack), #GET
+    path('uniqueaction/', endpoints.uniqueaction), #GET POST
+    path('uniqueaction/<int:uniqueactionId>/', endpoints.uniqueactionbyId), #GET PUT
+    path('specialrule/', endpoints.specialrule), #GET POST
+    path('specialrule/<int:specialruleId>/', endpoints.specialrulebyId), #GET PUT
+    path('ability/', endpoints.ability), #GET POST
+    path('ability/<int:abilityId>/', endpoints.abilitybyId), #GET PUT
+    path('customarmy/', endpoints.getcustomarmy), #GET POST
+    path('customarmy/<int:customarmyId>/', endpoints.customarmy), #GET PUT DELETE
+    path('operativegun/', endpoints.getcustomopp), #GET POST
+    path('operativegun/<int:operativegunId>/', endpoints.customopp), #GET PUT DELETE
 ]

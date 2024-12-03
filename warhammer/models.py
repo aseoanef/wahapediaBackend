@@ -10,7 +10,7 @@ class Operative(models.Model):
     df = models.IntegerField() #Defence
     sv = models.IntegerField() #save throw
     w = models.IntegerField() #wounds
-    base= models.IntegerField() #base diametro
+    base= models.IntegerField() #base diámetro
     unique_action = models.ManyToManyField('UniqueAction',blank=True)
     gun = models.ManyToManyField('Gun',blank=True)
     def to_json(self):
@@ -92,15 +92,13 @@ class Army(models.Model):
 class CustomArmy(models.Model):
     name = models.CharField(max_length=240,null=False)
     army = models.ForeignKey('Army',on_delete=models.CASCADE,null=True,blank=True)
-    operative = models.ManyToManyField('OperativeGun',null=True,blank=True)
+    operative = models.ManyToManyField('OperativeGun',blank=True)
 
 
 class OperativeGun(models.Model):
     name = models.CharField(max_length=250,null=True,blank=True)
     operative = models.ForeignKey('Operative',on_delete=models.CASCADE,blank=True,null=True)
-    gun = models.ManyToManyField('Gun',null=True,blank=True)
-    operative = models.ForeignKey('Operative',on_delete=models.CASCADE,null=True,blank=True)
-    gun = models.ManyToManyField('Gun',null=True,blank=True)
+    gun = models.ManyToManyField('Gun',blank=True)
 
 
 class Ability(models.Model):
