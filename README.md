@@ -1,6 +1,7 @@
 # wahapediaBackend
 Backend que devuelve datos de warhammer 40k : kill team y en el que se pueden crear y guardar los killteam de cada usuario.
 - [Requisitos](#requisitos)
+- [Tecnologías](#tecnologias)
 - [Instalación](#instalacion)
 - [Uso](#uso)
 - [Documentación](#documentacion)
@@ -8,6 +9,10 @@ Backend que devuelve datos de warhammer 40k : kill team y en el que se pueden cr
 - [Contribuidores](#contribuidores)
 ## Requisitos
 https://github.com/aseoanef/wahapediaBackend/blob/main/requirements.txt
+## Tecnologias
+Python
+Django
+PostgreSQL
 ## Instalacion
 1. Clonar el repositorio:
 ```bash
