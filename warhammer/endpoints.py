@@ -694,7 +694,7 @@ def customarmy(request,customarmyId): # devuelve un custom opps según id
             'operatives': listoperatives,
         })
         return JsonResponse(json_response, safe=False)
-    elif request.method == "PUT":
+    elif request.method == "PUT": #curl -X PUT --data {\"operativeId\":2,\"newName\":\"ejercito_person\"} 127.0.0.1:8000/customarmy/
         # Obtener el objeto CustomArmy por su ID
         army = CustomArmy.objects.get(pk=customarmyId)
         try:
